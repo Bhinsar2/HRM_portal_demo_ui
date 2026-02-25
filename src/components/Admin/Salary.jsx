@@ -31,7 +31,7 @@ const SalaryView = () => {
         }
         fetchData();
 
-    },[]);
+    },[id]);
 
 
     const inputEvent = (e) =>
@@ -54,7 +54,6 @@ const SalaryView = () => {
         const {salary, bonus, reasonForBonus} = formData;
         if(!salary || !bonus || !reasonForBonus) return toast.error('All Field Required');
         
-        const d = new Date();
         
         formData["employeeID"] = employee.id;
 
