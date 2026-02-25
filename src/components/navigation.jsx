@@ -1,6 +1,3 @@
-import { useDispatch } from "react-redux";
-import { useHistory } from "react-router";
-
 const Navigation = ({ toggleSidebar }) => {
 
     return (
