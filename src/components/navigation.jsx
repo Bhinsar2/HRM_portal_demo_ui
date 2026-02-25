@@ -1,20 +1,16 @@
 import { useDispatch } from "react-redux";
 import { useSelector } from "react-redux";
 import { useHistory } from "react-router";
-import { NavLink } from "react-router-dom";
+
 import { dLogout } from "../http";
 import { setAuth } from "../store/auth-slice";
 
 const Navigation = ({ toggleSidebar }) => {
-    const { name} = useSelector((state) => state.authSlice.user);
+
     const dispatch = useDispatch();
     const history = useHistory();
 
-    const logout = async () => {
-        await dLogout();
-        dispatch(setAuth(null));
-        return history.push('/login');
-    };
+
 
     return (
         <>

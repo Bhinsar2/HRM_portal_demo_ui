@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import HeaderSection from "../../components/HeaderSection";
+
 import RowLeader from "../../components/rows/row-leader";
 import { getLeaders } from "../../http";
 

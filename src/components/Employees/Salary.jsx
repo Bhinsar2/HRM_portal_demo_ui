@@ -20,14 +20,14 @@ const Salary = () => {
     console.log(user.id);
     const fetchData = async () => {
       const res = await viewEmployeeSalary(obj);
-      const {success,data} = res;
+      const {data} = res;
       if(data.length>0){
         setSalary(res.data[0]);
       }
-      else toast.error(user.name+ "'s" +" " + "Salary not found");
+      else toast.error(`${user.name}'s Salary not found`);
     }
     fetchData();
-  },[]);
+  },[user.id, user.name]);
 
   return (
     <>
@@ -38,10 +38,10 @@ const Salary = () => {
               <div className="card">
                 <div className="card-header d-flex justify-content-between">
                   {
-                    !salary?
-                    (<h4>Salary not yet updated</h4>)
-                    :
+                    salary?
                     (<h4>Updated Salary from {salary?.assignedDate}</h4>)
+                    :
+                    (<h4>Salary not yet updated</h4>)
                   }
                 </div>
               </div>

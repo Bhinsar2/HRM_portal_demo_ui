@@ -40,7 +40,7 @@ const Team = () => {
         setMembersLoading(false);
       }
     })();
-  }, [id])
+  }, [id, dispatch])
 
   const modalAction = async () => {
     setShowModal(showModal ? false : true);

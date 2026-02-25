@@ -20,7 +20,7 @@ const EditUser = () => {
     const [imagePreview, setImagePreview] = useState('/assets/icons/user.png');
     const [formData, setFormData] = useState(initialState);
     const [showModal, setShowModal] = useState(false);
-    const [updateFormData, setUpdatedFormData] = useState({});
+
 
     const [userType, setUserType] = useState('User');
 
@@ -46,12 +46,6 @@ const EditUser = () => {
             }
 
         });
-        setUpdatedFormData((old) => {
-            return {
-                ...old,
-                [name]: value
-            }
-        })
     }
 
     const onSubmit = async (e) => {

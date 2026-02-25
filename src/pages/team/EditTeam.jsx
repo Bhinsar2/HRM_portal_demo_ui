@@ -13,7 +13,7 @@ const EditTeam = () => {
         status: ''
     });
 
-    const [updateFormData, setUpdatedFormData] = useState({});
+
 
     const { id } = useParams();
 
@@ -37,12 +37,6 @@ const EditTeam = () => {
 
         })
 
-        setUpdatedFormData((old) => {
-            return {
-                ...old,
-                [name]: value
-            }
-        })
     }
 
     const onSubmit = async (e) => {

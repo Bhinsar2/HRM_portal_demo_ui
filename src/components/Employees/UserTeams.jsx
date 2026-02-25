@@ -16,7 +16,7 @@ const UserTeams = () => {
   const dispatch = useDispatch();
   dispatch(setTeam(null));
   dispatch(setTeamMembers(null))
-  const [loading, setLoading] = useState(true);
+
   const [userteam, setUserTeam] = useState({});
 
   useEffect(() => {
@@ -25,11 +25,11 @@ const UserTeams = () => {
         const res = await getEmployeeTeam(user?.team?.id);
         if (res.success) {
           setUserTeam(res.data);
-          setLoading(false);
+
         }
       }
     })();
-  }, [])
+  }, [user?.team?.id])
 
 
 
