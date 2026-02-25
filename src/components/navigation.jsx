@@ -1,16 +1,7 @@
 import { useDispatch } from "react-redux";
-import { useSelector } from "react-redux";
 import { useHistory } from "react-router";
 
-import { dLogout } from "../http";
-import { setAuth } from "../store/auth-slice";
-
 const Navigation = ({ toggleSidebar }) => {
-
-    const dispatch = useDispatch();
-    const history = useHistory();
-
-
 
     return (
         <>
@@ -21,7 +12,7 @@ const Navigation = ({ toggleSidebar }) => {
                     <ul className="navbar-nav mr-3" style={{ gap: '4px' }}>
                         <li>
                             <a
-                                href="#"
+                                href="#!"
                                 onClick={(e) => {
                                     e.preventDefault();
                                     toggleSidebar();
