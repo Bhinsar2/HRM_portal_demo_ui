@@ -1,113 +1,114 @@
 import { useState } from "react";
 import { toast } from "react-toastify";
-import HeaderSection from "../../components/HeaderSection";
 import { addTeam } from "../../http";
 
-const AddTeam = () =>
-{
-    const initialState = {name:'',description:'',image:''};
+const AddTeam = () => {
+    const initialState = { name: '', description: '', image: '' };
     const [imagePreview, setImagePreview] = useState('/assets/icons/team.png');
-    const [formData,setFormData] = useState(initialState);
+    const [formData, setFormData] = useState(initialState);
+    const [errors, setErrors] = useState({});
+    const [loading, setLoading] = useState(false);
 
-    const inputEvent = (e) =>
-    {
-        const {name,value} = e.target;
-        setFormData((old)=>
-        {
-            return{
-                ...old,
-                [name]:value
-            }
-        })
-    }
+    const inputEvent = (e) => {
+        const { name, value } = e.target;
+        setFormData(old => ({ ...old, [name]: value }));
+        if (errors[name]) setErrors(o => ({ ...o, [name]: '' }));
+    };
 
-    const onSubmit = async (e) =>
-    {
+    const validate = () => {
+        const errs = {};
+        if (!formData.name) errs.name = 'Team name is required.';
+        if (!formData.description) errs.description = 'Description is required.';
+        return errs;
+    };
+
+    const onSubmit = async (e) => {
         e.preventDefault();
+        const errs = validate();
+        if (Object.keys(errs).length) { setErrors(errs); return; }
 
-        const {name,description} = formData;
-        if(!name || !description) return toast.error('All Field Required');;
-
-        const fd = new FormData();
-        Object.keys(formData).map((key)=>
-        {
-            return fd.append(key,formData[key]);
-        })
-        const res = await addTeam(fd);
-        if(res.success)
-        {
-            setFormData({...initialState});
-            setImagePreview('/assets/icons/team.png');
-            toast.success(res.message);
-        }
-    }
-
-    const captureImage = (e) =>
-    {
-        const file = e.target.files[0];
-        setFormData((old)=>
-        {
-            return{
-                ...old,
-                image:file
+        setLoading(true);
+        try {
+            console.log("Creating Team Data (JSON):", formData);
+            const res = await addTeam(formData);
+            if (res.success) {
+                toast.success(res.message || 'Team created!');
+                setFormData({ ...initialState });
+                setImagePreview('/assets/icons/team.png');
+                setErrors({});
+            } else {
+                toast.error(res.message || 'Failed to create team.');
             }
+        } catch {
+            toast.error('Network error. Please try again.');
+        } finally {
+            setLoading(false);
+        }
+    };
 
-        })
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onloadend = () => setImagePreview(reader.result);
-    }
-
-    return(
-        <>
+    return (
         <div className="main-content">
-        <section className="section">
-            <HeaderSection title='Add User'/>
-                <div className="card">
-                  <div className="card-body pr-5 pl-5 m-1">
-                    <form className='row' onSubmit={onSubmit}>
-                        <div className="form-group col-md-12 text-center">
-                            <div className="input-group justify-content-center">
-                                <input type="file" id='image' name='image' className="form-control d-none" onChange={captureImage} accept="image/*" />
-                                <label htmlFor='image'> <img className='rounded' src={imagePreview} width='120' alt="" /> </label>
-                            </div>
-                        </div>
-
-                        <div className="form-group col-md-12">
-                            <label>Enter Team Name</label>
-                            <div className="input-group">
-                                <div className="input-group-prepend">
-                                <div className="input-group-text">
-                                    <i className="fas fa-user"></i>
-                                </div>
-                                </div>
-                                <input onChange={inputEvent} value={formData.name} type="text" id='name' name='name' className="form-control"/>
-                            </div>
-                        </div>
-
-                        <div className="form-group col-md-12 ">
-                            <label>Enter Team Description</label>
-                            <div className="input-group">
-                                <div className="input-group-prepend">
-                                <div className="input-group-text">
-                                    <i className="fas fa-file-alt"></i>
-                                </div>
-                                </div>
-                                <input onChange={inputEvent} value={formData.description} type="text" id='description' name='description' className="form-control"/>
-                            </div>
-                        </div>
-
-                        <div className="form-group text-center col-md-12">
-                            <button className='btn btn-primary btn-lg' type='submit' style={{width:'30vh'}}>Add Team</button>
-                        </div>
-
-                    </form>
-                  </div>
+            <div className="page-header">
+                <div>
+                    <h2>Add Team</h2>
+                    <p>Create a new team in your organization</p>
                 </div>
-        </section>
-      </div>
-      </>
-    )
-}
+            </div>
+
+            <div className="form-card" style={{ maxWidth: 580 }}>
+                <div className="form-card-title">Team Details</div>
+                <form onSubmit={onSubmit}>
+                    {/* Image preview */}
+                    <div className="form-group text-center">
+                        <div style={{ display: 'inline-block' }}>
+                            <img
+                                src={imagePreview}
+                                alt="Team"
+                                style={{ width: 100, height: 100, borderRadius: 12, objectFit: 'cover', border: '1px solid var(--border)', background: 'var(--bg-alt)' }}
+                            />
+                        </div>
+                    </div>
+
+                    {/* Team Name */}
+                    <div className="form-group">
+                        <label className="form-label-modern">Team Name</label>
+                        <input
+                            onChange={inputEvent}
+                            value={formData.name}
+                            type="text"
+                            name="name"
+                            placeholder="e.g. Engineering Team"
+                            className={`form-control${errors.name ? ' is-invalid' : ''}`}
+                        />
+                        {errors.name && <div className="field-error"><i className="fas fa-exclamation-circle"></i> {errors.name}</div>}
+                    </div>
+
+                    {/* Description */}
+                    <div className="form-group">
+                        <label className="form-label-modern">Description</label>
+                        <input
+                            onChange={inputEvent}
+                            value={formData.description}
+                            type="text"
+                            name="description"
+                            placeholder="e.g. Handles product development"
+                            className={`form-control${errors.description ? ' is-invalid' : ''}`}
+                        />
+                        {errors.description && <div className="field-error"><i className="fas fa-exclamation-circle"></i> {errors.description}</div>}
+                    </div>
+
+                    <button
+                        className="btn btn-primary"
+                        type="submit"
+                        disabled={loading}
+                        style={{ padding: '10px 28px', fontWeight: 600 }}
+                    >
+                        {loading ? <><i className="fas fa-spinner fa-spin" style={{ marginRight: 6 }}></i>Creating...</> : 'Create Team'}
+                    </button>
+                </form>
+            </div>
+        </div>
+    );
+};
 
 export default AddTeam;

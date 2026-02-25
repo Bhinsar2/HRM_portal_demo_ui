@@ -32,6 +32,6 @@ export const useAutoLogin = () =>
             }
 
         })();
-    })
+    },[])  // run only once on mount
     return loading;
 }

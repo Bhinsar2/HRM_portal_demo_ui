@@ -1,0 +1,32 @@
+/* Override legacy template colors so MNC HRM theme variables apply (load after style.css) */
+.bg-primary { background-color: var(--primary) !important; }
+.text-primary, .text-primary-all *, .text-primary-all *:before, .text-primary-all *:after { color: var(--primary) !important; }
+.text-muted { color: var(--text-muted) !important; }
+a:not(.btn):not(.btn-social-icon):not(.btn-social):not(.page-link) { color: var(--primary); }
+
+/* Ensure primary buttons and form focus use theme */
+.btn-primary {
+  background: var(--primary) !important;
+  border-color: var(--primary) !important;
+}
+.btn-primary:hover {
+  background: var(--primary-hover) !important;
+  border-color: var(--primary-hover) !important;
+  box-shadow: 0 4px 14px rgba(13, 148, 136, 0.35) !important;
+}
+.form-control:focus {
+  border-color: var(--primary) !important;
+  box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.15) !important;
+}
+
+/* Sidebar mini mode – keep dark blue */
+body.sidebar-mini .main-sidebar.sidebar-pro:after {
+  background-color: var(--sidebar-bg) !important;
+}
+
+/* Sidebar mini mode active state */
+body.sidebar-mini .main-sidebar .sidebar-menu > li.active > a {
+  background-color: rgba(255, 255, 255, 0.15) !important;
+  color: var(--sidebar-text) !important;
+  box-shadow: none !important;
+}

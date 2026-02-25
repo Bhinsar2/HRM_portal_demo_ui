@@ -6,7 +6,7 @@ import { getFreeEmployees, getTeam, getTeamMembers, getFreeLeaders } from "../..
 import { useDispatch } from "react-redux";
 import { useSelector } from "react-redux";
 import { setTeam, setTeamInformation } from '../../../store/team-slice';
-import { setFreeEmployees, setTeamMembers,setFreeLeaders } from '../../../store/user-slice';
+import { setFreeEmployees, setTeamMembers, setFreeLeaders } from '../../../store/user-slice';
 import LeaderModal from "./modal/LeaderModal";
 import LeadersModal from "./modal/LeadersModal";
 import MembersModal from "./modal/MembersModal";
@@ -22,9 +22,9 @@ const Team = () => {
   const [freeLeaderCalled, setFreeLeaderApiCalled] = useState(false);
   const [membersLoading, setMembersLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
-  const [showLeaderModal,setShowLeaderModal] = useState(false);
-  const [showLeadersModal,setShowLeadersModal] = useState(false);
- 
+  const [showLeaderModal, setShowLeaderModal] = useState(false);
+  const [showLeadersModal, setShowLeadersModal] = useState(false);
+
   const { id } = useParams();
   useEffect(() => {
     (async () => {
@@ -64,16 +64,15 @@ const Team = () => {
     }
   }
 
-  const modalLeaderAction = () =>
-  {
+  const modalLeaderAction = () => {
     setShowLeaderModal(showLeaderModal ? false : true);
   }
 
   return (
     <>
-        {showModal && <MembersModal close={modalAction}/>}
-        {showLeaderModal && <LeaderModal close={modalLeaderAction}/> }
-        {showLeadersModal && <LeadersModal close={modalLeadersAction}/>}
+      {showModal && <MembersModal close={modalAction} />}
+      {showLeaderModal && <LeaderModal close={modalLeaderAction} />}
+      {showLeadersModal && <LeadersModal close={modalLeadersAction} />}
 
       <div className="main-content">
         <section className="section">
@@ -97,7 +96,7 @@ const Team = () => {
               <div className="card">
                 <div className="card-body row">
                   <div className="col-md-3 ">
-                    <img className='img-fluid img-thumbnail' src={team.image} alt="" />
+                    <img className='img-fluid img-thumbnail' src={team.image || '/assets/icons/team.png'} alt="" />
                   </div>
                   <div className="col-md-9">
                     <table className='table'>
@@ -113,19 +112,19 @@ const Team = () => {
                         <tr>
                           <th>Leader</th>
                           <td>
-                            { 
+                            {
                               team.leader ?
-                                <button  className='badge btn badge-primary' onClick={modalLeaderAction} style={{padding:'0px 10px 0px 0px'}}>
-                                <img src={team.leader.image} className='avatar avatar-sm mr-2' alt="Person" width="96" height="96"/>
-                                {team.leader.name}
-                            </button>
-                            :
-                            <button onClick={modalLeadersAction} className='badge badge-light btn' style={{padding:'0px 10px 0px 0px'}}>
-                                <img src='../assets/icons/user.png' className='avatar avatar-sm mr-2' alt="Person"/>
-                                No Leader
-                            </button> 
+                                <button className='badge btn badge-primary' onClick={modalLeaderAction} style={{ padding: '0px 10px 0px 0px' }}>
+                                  <img src={team.leader.image || `https://ui-avatars.com/api/?name=${encodeURIComponent(team.leader.name || 'User')}&size=64`} className='avatar avatar-sm mr-2' alt="Person" width="96" height="96" />
+                                  {team.leader.name}
+                                </button>
+                                :
+                                <button onClick={modalLeadersAction} className='badge badge-light btn' style={{ padding: '0px 10px 0px 0px' }}>
+                                  <img src='../assets/icons/user.png' className='avatar avatar-sm mr-2' alt="Person" />
+                                  No Leader
+                                </button>
                             }
-                        </td>
+                          </td>
                         </tr>
                       </tbody>
                     </table>
@@ -147,7 +146,7 @@ const Team = () => {
                     <thead>
                       <tr>
                         <th>#</th>
-                        <th>Image</th>
+                        {/* <th>Image</th> */}
                         <th>Name</th>
                         <th>Email</th>
                         <th>Mobile</th>

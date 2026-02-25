@@ -1,94 +1,133 @@
 import { useState } from "react";
 import { useHistory } from "react-router";
 import { useSelector } from "react-redux";
-import {resetPassword} from "../../../http/index";
+import { resetPassword } from "../../../http/index";
 import { toast } from "react-toastify";
 
-const ResetPassword = () =>
-{
-    const {email} = useSelector((state)=>state.authSlice);
-    const [formData,setFormData] = useState({
-        email:email,
-        otp:'',
-        password:''
-    });
+// Eye Open Icon
+const EyeOpen = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+        <path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+    </svg>
+);
 
+// Eye Closed Icon
+const EyeClosed = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.477 0-8.268-2.943-9.542-7a10.005 10.005 0 012.187-3.679M6.53 6.53A9.953 9.953 0 0112 5c4.477 0 8.268 2.943 9.542 7a10.006 10.006 0 01-4.272 5.328M6.53 6.53L3 3m3.53 3.53l10.94 10.94M17.47 17.47L21 21" />
+    </svg>
+);
+
+const ResetPassword = () => {
+    const { email } = useSelector((state) => state.authSlice);
+    const [formData, setFormData] = useState({ email: email, otp: '', password: '' });
+    const [showPassword, setShowPassword] = useState(false);
     const history = useHistory();
 
-    const inputEvent = (e) =>
-    {
-        const {name,value} = e.target;
-        setFormData((old)=>
-        {
-            return{
-                ...old,
-                [name]:value
-            }
-        })
-    }
+    const inputEvent = (e) => {
+        const { name, value } = e.target;
+        setFormData((old) => ({ ...old, [name]: value }));
+    };
 
-    const onSubmit = async (e) =>
-    {
+    const onSubmit = async (e) => {
         e.preventDefault();
-        const {email,otp,password} = formData;
-        if(!email || !otp || !password) return toast.error('All Fields Required');
-        const res = await resetPassword({email,otp,password});
-        console.log(res);
+        const { email, otp, password } = formData;
+        if (!email || !otp || !password) return toast.error('All Fields Required');
+        const res = await resetPassword({ email, otp, password });
         res.success ? toast.success(res.message) : toast.error(res.message);
-        if(res.success)
-            history.push('/login');
-    }
-    return(
-        <div id="app">
-            <section className="section">
-            <div className="container mt-5">
-                <div className="row">
-                <div className="col-12 col-sm-8 offset-sm-2 col-md-6 offset-md-3 col-lg-6 offset-lg-3 col-xl-4 offset-xl-4">
-                <div className="login-brand">
-                  <img src="https://www.pockethrms.com/wp-content/uploads/2022/01/Happy-Workforce.jpg" alt="logo" width="200" className=""/>
+        if (res.success) history.push('/login');
+    };
+
+    return (
+        <div className="auth-page">
+            <div className="auth-card">
+                {/* Brand */}
+                <div className="auth-logo-wrap">
+                    <img
+                        src="https://www.pockethrms.com/wp-content/uploads/2022/01/Happy-Workforce.jpg"
+                        alt="HRM Logo"
+                    />
+                    <h1>Reset Password</h1>
+                    <p>Enter the OTP sent to your email and choose a new password</p>
                 </div>
-                    <div className="card card-primary">
-                    <div className="card-header"><h4>Reset Password</h4></div>
 
-                    <div className="card-body">
-                        <p className="text-muted">We have send you an OTP to reset your password</p>
-                        <form onSubmit={onSubmit}>
-                        <div className="form-group">
-                            <label for="email">Email</label>
-                            <input id="email" onChange={inputEvent} value={formData.email} type="email" className="form-control" name="email" tabIndex="1" required autoFocus readOnly/>
-                        </div>
+                <form onSubmit={onSubmit}>
+                    {/* Email (read-only) */}
+                    <div className="form-group">
+                        <label className="auth-form-label" htmlFor="email">Email address</label>
+                        <input
+                            id="email"
+                            onChange={inputEvent}
+                            value={formData.email}
+                            type="email"
+                            className="form-control"
+                            name="email"
+                            tabIndex="1"
+                            required
+                            readOnly
+                            style={{ background: 'var(--bg)', color: 'var(--text-muted)', cursor: 'not-allowed' }}
+                        />
+                    </div>
 
-                        <div className="form-group">
-                            <label for="otp">OTP</label>
-                            <input id="otp" onChange={inputEvent} value={formData.otp} type="number" className="form-control pwstrength" data-indicator="pwindicator" name="otp" tabIndex="2" required/>
-                            <div id="pwindicator" className="pwindicator">
-                            <div className="bar"></div>
-                            <div className="label"></div>
-                            </div>
-                        </div>
+                    {/* OTP */}
+                    <div className="form-group">
+                        <label className="auth-form-label" htmlFor="otp">OTP Code</label>
+                        <input
+                            id="otp"
+                            onChange={inputEvent}
+                            value={formData.otp}
+                            type="number"
+                            className="form-control"
+                            name="otp"
+                            placeholder="Enter OTP"
+                            tabIndex="2"
+                            required
+                        />
+                    </div>
 
-                        <div className="form-group">
-                            <label for="password">New Password</label>
-                            <input id="password" onChange={inputEvent} value={formData.password} type="password" className="form-control" name="password" tabIndex="2" required/>
-                        </div>
-
-                        <div className="form-group">
-                            <button type="submit" className="btn btn-primary btn-lg btn-block" tabIndex="4">
-                            Reset Password
+                    {/* New Password with Eye Toggle */}
+                    <div className="form-group">
+                        <label className="auth-form-label" htmlFor="password">New Password</label>
+                        <div className="auth-input-wrap">
+                            <input
+                                id="password"
+                                onChange={inputEvent}
+                                value={formData.password}
+                                type={showPassword ? "text" : "password"}
+                                className="form-control"
+                                name="password"
+                                placeholder="••••••••"
+                                tabIndex="3"
+                                required
+                            />
+                            <button
+                                type="button"
+                                className="eye-toggle"
+                                onClick={() => setShowPassword(!showPassword)}
+                                aria-label={showPassword ? "Hide password" : "Show password"}
+                            >
+                                {showPassword ? <EyeClosed /> : <EyeOpen />}
                             </button>
                         </div>
-                        </form>
                     </div>
-                    </div>
-                    <div className="simple-footer">
-                    Copyright &copy; Social Codia
-                    </div>
-                </div>
+
+                    <button type="submit" className="btn btn-primary auth-submit-btn" tabIndex="4">
+                        Reset Password
+                    </button>
+                </form>
+
+                <div className="auth-footer" style={{ justifyContent: 'center', borderTop: 'none', marginTop: '12px' }}>
+                    <span style={{ color: 'var(--text-muted)', fontSize: '13px' }}>
+                        Back to{' '}
+                        <a href="/login" style={{ color: 'var(--primary)', fontWeight: 600, textDecoration: 'none' }}>
+                            Sign in
+                        </a>
+                    </span>
                 </div>
             </div>
-            </section>
         </div>
-    )
-}
+    );
+};
 
 export default ResetPassword;

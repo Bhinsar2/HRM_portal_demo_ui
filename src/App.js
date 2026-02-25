@@ -26,9 +26,11 @@ import './App.css';
 import './assets/css/bootstrap.min.css';
 import './assets/css/style.css';
 import './assets/css/components.css';
+import './theme-overrides.css';
 import Leaders from './pages/leader/Leaders';
 import SideBar from './components/sidebar';
 import Navigation from './components/navigation';
+import MainLayout from './components/MainLayout';
 import Members from './pages/leaderpage/Members';
 import UserTeams from './components/Employees/UserTeams';
 import Attendance from './components/Employees/Attendance';
@@ -174,11 +176,9 @@ const ProtectedRoute = ({children,...rest}) =>
   return (
     <Route {...rest} render={({location})=>{
       return isAuth ? (
-        <>
-          <SideBar/>
-          <Navigation/>
+        <MainLayout>
           {children}
-        </>) : (
+        </MainLayout>) : (
         <Redirect
           to={{
             pathname:'/',
@@ -198,11 +198,9 @@ const AdminRoute = ({children,...rest}) =>
   return (
     <Route {...rest} render={({location})=>{
       return user && user.type==='Admin' ? (
-        <>
-          <SideBar/>
-          <Navigation/>
+        <MainLayout>
           {children}
-        </>) : (
+        </MainLayout>) : (
         <Redirect
           to={{
             pathname:'/',
@@ -222,11 +220,9 @@ const AdminLeaderRouter = ({children,...rest}) =>
   return (
     <Route {...rest} render={({location})=>{
       return user && (user.type==='Admin' || user.type==='Leader') ? (
-        <>
-          <SideBar/>
-          <Navigation/>
+        <MainLayout>
           {children}
-        </>) : (
+        </MainLayout>) : (
         <Redirect
           to={{
             pathname:'/',
@@ -247,11 +243,9 @@ const LeaderRoute = ({children,...rest}) =>
   return (
     <Route {...rest} render={({location})=>{
       return user && user.type==='Leader' ? (
-        <>
-          <SideBar/>
-          <Navigation/>
+        <MainLayout>
           {children}
-        </>) : (
+        </MainLayout>) : (
         <Redirect
           to={{
             pathname:'/',
@@ -271,11 +265,9 @@ const EmployeeRoute = ({children,...rest}) =>
   return (
     <Route {...rest} render={({location})=>{
       return user && user.type==='Employee' || user.type==='Leader' ? (
-        <>
-          <SideBar/>
-          <Navigation/>
+        <MainLayout>
           {children}
-        </>) : (
+        </MainLayout>) : (
         <Redirect
           to={{
             pathname:'/',

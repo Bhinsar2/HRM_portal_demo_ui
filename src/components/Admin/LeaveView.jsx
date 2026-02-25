@@ -1,182 +1,166 @@
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react';
 import { getEmployees, getLeaders, viewLeaves } from '../../http';
 import { useHistory } from "react-router-dom";
-import Loading from '../Loading';
 
-
+const statusBadge = (status) => {
+  const map = { Approved: 'badge-success', Rejected: 'badge-danger', Pending: 'badge-warning' };
+  return <span className={`badge-custom ${map[status] || 'badge-neutral'}`}>{status || '—'}</span>;
+};
 
 const LeaveView = () => {
-  const [type, setType] = useState();
-  const [status, setStatus] = useState();
-  const [appliedDate, setAppliedDate] = useState();
-  const [applications,setApplications] = useState();
+  const [type, setType] = useState('');
+  const [status, setStatus] = useState('');
+  const [appliedDate, setAppliedDate] = useState('');
+  const [applications, setApplications] = useState(null);
+  const [employees, setEmployees] = useState([]);
+  const [employeeMap, setEmployeeMap] = useState({});
+  const [selectedEmployee, setSelectedEmployee] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
   const history = useHistory();
-  const [employees, setEmployees] = useState();
-  const [employeeMap, setEmployeeMap] = useState();
-  const [selectedEmployee, setSelectedEmployee] = useState();
 
-  useEffect(()=>{
-
-    let empObj = {};
-    const fetchData = async () => {
-      const res = await viewLeaves({});
-      const {data} = res;
-      setApplications(data);
-    }
-
-    const fetchEmployees = async () => {
-      const emps = await getEmployees();
-      const leaders = await getLeaders();
-      emps.data.forEach(employee => empObj[employee.id] = [employee.name, employee.email]);
-      leaders.data.forEach(leader => empObj[leader.id] = [leader.name, leader.email]);
-      setEmployeeMap(empObj);
-      setEmployees([...emps.data,...leaders.data]);
-    }
-
-    fetchData();
-    fetchEmployees();
-
-  },[]);
-
-  const searchLeaveApplications = async () => {
-      const obj = {
-        
+  useEffect(() => {
+    const init = async () => {
+      try {
+        const [res, emps, leaders] = await Promise.all([viewLeaves({}), getEmployees(), getLeaders()]);
+        const empObj = {};
+        emps.data.forEach(e => empObj[e.id] = [e.name, e.email]);
+        leaders.data.forEach(l => empObj[l.id] = [l.name, l.email]);
+        setEmployeeMap(empObj);
+        setEmployees([...emps.data, ...leaders.data]);
+        setApplications(res.data || []);
+      } catch {
+        setError('Failed to load leave applications.');
+        setApplications([]);
+      } finally {
+        setLoading(false);
       }
+    };
+    init();
+  }, []);
 
-      if(selectedEmployee){
-        obj["applicantID"] = selectedEmployee;
-      }
-
-      if(type){
-        obj["type"] = type;
-      }
-      if(status){
-        obj["adminResponse"] = status
-      }
-      if(appliedDate){
-        obj["appliedDate"] = appliedDate;
-      }
-
-      console.log(obj);
-
+  const search = async () => {
+    setLoading(true);
+    setError('');
+    const obj = {};
+    if (selectedEmployee) obj.applicantID = selectedEmployee;
+    if (type) obj.type = type;
+    if (status) obj.adminResponse = status;
+    if (appliedDate) obj.appliedDate = appliedDate;
+    try {
       const res = await viewLeaves(obj);
-      const {data} = res;
-      setApplications(data);
-
-      setAppliedDate("");
-      setType("");
-      setStatus(""); 
-  }
+      setApplications(res.data || []);
+    } catch {
+      setError('Search failed. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
-    <>
-    {
-      applications?
-      (<div className="main-content">
-      <section className="section">
-              <div className="card">
-                <div className="card-header d-flex justify-content-between">
-                  <h4>Leave Applications</h4>
-                </div>
-              </div>
-        
-        <div className="d-flex justify-content-center align-items-center w-100">
-  
-        <div className="form-group col-md-2">
-        <label>Employee</label>
-          <select
-            className='form-control select2'
-            value={selectedEmployee}
-            onChange={(e) => setSelectedEmployee(e.target.value)}
-          >
-            <option value="">Employees</option>
-            {employees?.map((employee) => (
-              <option key={employee._id} value={employee.id}>
-                {employee.name}
-              </option>
-            ))}
-          </select>
+    <div className="main-content">
+      <div className="page-header">
+        <div>
+          <h2>Leave Applications</h2>
+          <p>Browse and filter all employee leave requests</p>
         </div>
-         
-        <div className="form-group col-md-2">
-                              <label>Leave Type</label>
-                              <select name='type' onChange={(e)=>setType(e.target.value)} className="form-control select2">
-                                 <option>Select</option>
-                                  <option>Sick Leave</option>
-                                  <option>Casual Leave</option>
-                                  <option>Emergency Leave</option>
-                              </select>
-                          </div>
-                          <div className="form-group col-md-2">
-                              <label>Status</label>
-                              <select name='type' onChange={(e)=>setStatus(e.target.value)} className="form-control select2">
-                                 <option>Select</option>
-                                  <option>Pending</option>
-                                  <option>Approved</option>
-                                  <option>Rejected</option>
-                              </select>
-                          </div> 
-  
-                           <div className="form-group col-md-4"> 
-                          <label>Applied Date</label>
-                          <div className="input-group">
-                                  <div className="input-group-prepend">
-                                  <div className="input-group-text">
-                                  <i class="fa fa-calendar"></i>
-                                  </div>
-                                  </div>
-                                  <input onChange={(e)=>setAppliedDate(e.target.value)} type="date" id="startDate" name="startDate" className="form-control"></input>
-                            
-                              </div>
-                          </div>                  
-  
-       
-        
-        <button onClick={searchLeaveApplications} className="btn btn-lg btn-primary col">Search</button>
       </div>
-      </section>
-      <div className="table-responsive">
-          <table className="table table-striped table-md center-text">
+
+      <div className="data-card">
+        {/* Filter bar */}
+        <div className="filter-bar">
+          <div className="form-group">
+            <label className="form-label-modern">Employee</label>
+            <select className="form-control" value={selectedEmployee} onChange={e => setSelectedEmployee(e.target.value)}>
+              <option value="">All Employees</option>
+              {employees.map(e => <option key={e._id} value={e.id}>{e.name}</option>)}
+            </select>
+          </div>
+          <div className="form-group">
+            <label className="form-label-modern">Leave Type</label>
+            <select className="form-control" value={type} onChange={e => setType(e.target.value)}>
+              <option value="">All Types</option>
+              <option>Sick Leave</option>
+              <option>Casual Leave</option>
+              <option>Emergency Leave</option>
+            </select>
+          </div>
+          <div className="form-group">
+            <label className="form-label-modern">Status</label>
+            <select className="form-control" value={status} onChange={e => setStatus(e.target.value)}>
+              <option value="">All Statuses</option>
+              <option>Pending</option>
+              <option>Approved</option>
+              <option>Rejected</option>
+            </select>
+          </div>
+          <div className="form-group">
+            <label className="form-label-modern">Applied Date</label>
+            <input type="date" className="form-control" value={appliedDate} onChange={e => setAppliedDate(e.target.value)} />
+          </div>
+          <button onClick={search} className="btn btn-primary" style={{ padding: '9px 20px', fontWeight: 600, alignSelf: 'flex-end' }}>
+            <i className="fas fa-search" style={{ marginRight: 6 }}></i>Search
+          </button>
+        </div>
+
+        {error && (
+          <div style={{ padding: '14px 22px', background: '#ffe4e6', color: '#be123c', fontSize: '13.5px', display: 'flex', alignItems: 'center', gap: 8 }}>
+            <i className="fas fa-exclamation-circle"></i> {error}
+          </div>
+        )}
+
+        <div className="data-card-header" style={{ borderTop: '1px solid var(--border)', background: 'var(--surface)' }}>
+          <h3><i className="fas fa-file-alt" style={{ marginRight: 8, color: 'var(--primary)' }}></i> Applications</h3>
+          {applications && <span className="badge-custom badge-info">{applications.length} records</span>}
+        </div>
+
+        {loading ? (
+          <div style={{ padding: '32px 22px' }}>
+            {[...Array(5)].map((_, i) => <div key={i} className="shimmer" style={{ height: 44, marginBottom: 8 }} />)}
+          </div>
+        ) : (
+          <div className="table-responsive">
+            <table className="modern-table">
               <thead>
-                 <tr>
-                    <th>#</th>
-                    <th>Name</th>
-                    <th>Email</th>
-                    <th>Type</th>
-                    <th>Title</th>
-                    <th>Applied Date</th>
-                    <th>Status</th>
+                <tr>
+                  <th>#</th>
+                  <th>Employee</th>
+                  <th>Type</th>
+                  <th>Title</th>
+                  <th>Applied Date</th>
+                  <th>Status</th>
                 </tr>
               </thead>
-              
-              <tbody className="sidebar-wrapper">
-               {
-                 applications?.map((application,idx) => 
-                 
-                <tr className='hover-effect' onClick={()=>history.push(`leaves/${application._id}`)}> 
-                <td>{idx+1}</td>  
-                <td>{employeeMap && employeeMap[application.applicantID][0]}</td>
-                <td>{employeeMap && employeeMap[application.applicantID][1]}</td>
-                <td>{application.type}</td>
-                <td>{application.title}</td>
-                <td>{application.appliedDate}</td>
-                <td className={`${application.adminResponse==="Rejected"?"text-danger":application.adminResponse==="Pending"?"text-primary":"text-success"}`}>{application.adminResponse}</td>
-                </tr>
-               
-                 
-                )
-              }            
+              <tbody>
+                {applications?.length === 0 ? (
+                  <tr><td colSpan="6">
+                    <div className="empty-state">
+                      <i className="fas fa-file-times"></i>
+                      <p>No leave applications found</p>
+                    </div>
+                  </td></tr>
+                ) : (
+                  applications?.map((app, idx) => (
+                    <tr key={app._id || idx} className="clickable" onClick={() => history.push(`leaves/${app._id}`)}>
+                      <td style={{ color: 'var(--text-muted)', fontWeight: 600 }}>{idx + 1}</td>
+                      <td>
+                        <div style={{ fontWeight: 600 }}>{employeeMap?.[app.applicantID]?.[0] || '—'}</div>
+                        <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>{employeeMap?.[app.applicantID]?.[1] || ''}</div>
+                      </td>
+                      <td><span className="badge-custom badge-neutral">{app.type}</span></td>
+                      <td>{app.title}</td>
+                      <td style={{ color: 'var(--text-muted)' }}>{app.appliedDate}</td>
+                      <td>{statusBadge(app.adminResponse)}</td>
+                    </tr>
+                  ))
+                )}
               </tbody>
-          </table>
+            </table>
+          </div>
+        )}
       </div>
-    </div>)
-    :
-    <Loading/>
-    }
-    </>
-
-    
-  )
-}
+    </div>
+  );
+};
 
 export default LeaveView;

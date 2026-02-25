@@ -1,67 +1,73 @@
 import { useState } from "react";
-import {useSelector,useDispatch} from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { setEmail } from "../../../store/auth-slice";
 import { forgotPassword } from "../../../http";
 import { toast } from "react-toastify";
 
-const ForgotPassword = ({onNext}) =>
-{
+const ForgotPassword = ({ onNext }) => {
     const dispatch = useDispatch();
-    const storeEmail = useSelector((state)=>state.authSlice.email);
-    const [emailAddress,setEmailAddress] = useState(storeEmail);
-    const onSubmit = async (e) =>
-    {
+    const storeEmail = useSelector((state) => state.authSlice.email);
+    const [emailAddress, setEmailAddress] = useState(storeEmail);
+
+    const onSubmit = async (e) => {
         e.preventDefault();
-        if(!emailAddress) return;
-        const res = await forgotPassword({email:emailAddress});
-        if(res.success)
-        {
-            toast.error(res.message);
-            dispatch(setEmail(emailAddress))
+        if (!emailAddress) return;
+        const res = await forgotPassword({ email: emailAddress });
+        if (res.success) {
+            toast.success(res.message);
+            dispatch(setEmail(emailAddress));
             onNext();
-        }
-        else
+        } else {
             toast.error(res.message);
-        
-    }
-    return(
-        <div id="app">
-            <section className="section">
-            <div className="container mt-5">
-                <div className="row">
-                <div className="col-12 col-sm-8 offset-sm-2 col-md-6 offset-md-3 col-lg-6 offset-lg-3 col-xl-4 offset-xl-4">
-                <div className="login-brand">
-                  <img src="https://www.pockethrms.com/wp-content/uploads/2022/01/Happy-Workforce.jpg" alt="logo" width="200" className=""/>
+        }
+    };
+
+    return (
+        <div className="auth-page">
+            <div className="auth-card">
+                {/* Brand */}
+                <div className="auth-logo-wrap">
+                    <img
+                        src="https://www.pockethrms.com/wp-content/uploads/2022/01/Happy-Workforce.jpg"
+                        alt="HRM Logo"
+                    />
+                    <h1>Forgot Password?</h1>
+                    <p>Enter your email and we'll send you an OTP to reset your password</p>
                 </div>
 
-                    <div className="card card-primary">
-                    <div className="card-header"><h4>Forgot Password</h4></div>
+                <form onSubmit={onSubmit}>
+                    <div className="form-group">
+                        <label className="auth-form-label" htmlFor="email">Email address</label>
+                        <input
+                            id="email"
+                            onChange={(e) => setEmailAddress(e.target.value)}
+                            value={emailAddress}
+                            type="email"
+                            className="form-control"
+                            name="email"
+                            placeholder="you@company.com"
+                            tabIndex="1"
+                            required
+                            autoFocus
+                        />
+                    </div>
 
-                    <div className="card-body">
-                        <p className="text-muted">We will send an OTP to reset your password</p>
-                        <form onSubmit={onSubmit}>
-                            <div className="form-group">
-                                <label htmlFor="email">Email</label>
-                                <input id="email" onChange={(e)=>setEmailAddress(e.target.value)} value={emailAddress} type="email" className="form-control" name="email" tabIndex="1" required autoFocus/>
-                            </div>
+                    <button type="submit" className="btn btn-primary auth-submit-btn" tabIndex="2">
+                        Send OTP
+                    </button>
+                </form>
 
-                            <div className="form-group">
-                                <button type="submit" className="btn btn-primary btn-lg btn-block" tabIndex="4">
-                                Forgot Password
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                    </div>
-                    <div className="simple-footer">
-                    Copyright &copy; Social Codia
-                    </div>
-                </div>
+                <div className="auth-footer" style={{ justifyContent: 'center', borderTop: 'none', marginTop: '12px' }}>
+                    <span style={{ color: 'var(--text-muted)', fontSize: '13px' }}>
+                        Remember your password?{' '}
+                        <a href="/login" style={{ color: 'var(--primary)', fontWeight: 600, textDecoration: 'none' }}>
+                            Sign in
+                        </a>
+                    </span>
                 </div>
             </div>
-            </section>
         </div>
-    )
-}
+    );
+};
 
 export default ForgotPassword;

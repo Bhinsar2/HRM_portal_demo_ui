@@ -62,7 +62,7 @@ api.interceptors.response.use((response)=>{
     return response.data;
 },(error)=>{
     console.log(error);
-    return error.response.data
+    return error?.response?.data ?? {success:false, message:'Network error. Please try again.'}
 })
 
 export default api;
